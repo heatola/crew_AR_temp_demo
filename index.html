@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 1. Include the free A-Frame and Mind-AR libraries -->
+    <script src="https://aframe.io"></script>
+    <script src="https://jsdelivr.net"></script>
+  </head>
+  
+  <body style="margin: 0px; overflow: hidden;">
+    <!-- 2. Link your tracking targets file (.mind) here -->
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <!-- 3. Pre-load your exported Blender 3D model (.glb) -->
+        <a-asset-item id="woodenModel" src="./wood_effect.glb"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- 4. Tell the system to display the model when "Target 0" is scanned -->
+      
+        <!-- Adjust position, rotation, scale, and enable Blender animations -->
+        <a-gltf-model src="#woodenModel" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0" animation-mixer></a-gltf-model>
+      
+      
+    </a-scene>
+  </body>
+</html>
