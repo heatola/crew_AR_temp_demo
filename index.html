@@ -5,68 +5,74 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Wooden Figure AR</title>
     
-    <!-- Stable WebAR Libraries -->
+    <!-- Light-loading script imports -->
     <script src="https://aframe.io"></script>
     <script src="https://jsdelivr.net"></script>
     <script src="https://jsdelivr.net"></script>
     
     <style>
-      /* Absolute overlay UI for the Start Button */
+      body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #111; }
       #overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 9999;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        font-family: sans-serif; color: white;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #1e1e24; z-index: 99999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: white;
       }
       #startButton {
-        padding: 15px 35px; font-size: 18px; font-weight: bold;
-        background: #d4a373; color: white; border: none;
-        border-radius: 30px; cursor: pointer; transition: 0.2s;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        padding: 16px 40px; font-size: 18px; font-weight: bold; letter-spacing: 0.5px;
+        background: #d4a373; color: white; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 10px 25px rgba(212,163,115,0.4);
       }
-      #startButton:active { transform: scale(0.95); }
-      #instruction { margin-top: 15px; font-size: 14px; opacity: 0.8; }
+      #startButton:active { transform: scale(0.97); }
+      #instruction { margin-top: 20px; font-size: 13px; opacity: 0.6; text-align: center; max-width: 80%; line-height: 1.5; }
+      #arContainer { width: 100%; height: 100%; display: none; }
     </style>
   </head>
   
-  <body style="margin: 0px; overflow: hidden;">
+  <body>
 
-    <!-- User Interaction Security Overlay -->
+    <!-- Instant HTML UI Screen Elements -->
     <div id="overlay">
       <button id="startButton">OPEN AR CAMERA</button>
-      <div id="instruction">Tap to grant camera access</div>
+      <div id="instruction">Requires camera permissions to trace your physical target item.</div>
     </div>
     
-    <!-- AR Engine Scene Configuration -->
-    <a-scene id="arScene" mindar-image="imageTargetSrc: targets.mind; autoStart: false; uiLoading: yes; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-      
-      <a-assets>
-        <a-asset-item id="woodenModel" src="wood_effect.glb"></a-asset-item>
-      </a-assets>
+    <!-- Isolated Dynamic Container prevents canvas runtime crash -->
+    <div id="arContainer">
+      <a-scene id="arScene" mindar-image="imageTargetSrc: targets.mind; autoStart: false; uiLoading: yes; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        <a-assets>
+          <a-asset-item id="woodenModel" src="wood_effect.glb"></a-asset-item>
+        </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- Matches Target index 0 from your tracking compiler -->
-      
-        <a-gltf-model src="#woodenModel" position="0 0 0" scale="1 1 1" rotation="0 0 0" animation-mixer></a-gltf-model>
-      
-      
-    </a-scene>
+        
+          <a-gltf-model src="#woodenModel" position="0 0 0" scale="1 1 1" rotation="0 0 0" animation-mixer></a-gltf-model>
+        
+      </a-scene>
+    </div>
 
     <script>
-      // Script handling safe user activation sequence
       const startButton = document.getElementById('startButton');
       const overlay = document.getElementById('overlay');
-      const sceneEl = document.getElementById('arScene');
+      const container = document.getElementById('arContainer');
 
       startButton.addEventListener('click', () => {
-        overlay.style.display = 'none'; // Clear the screen layer
+        // 1. Instantly swap the interface wrapper layout
+        overlay.style.display = 'none';
+        container.style.display = 'block';
         
-        // Command Mind-AR system to explicitly start camera loop
-        sceneEl.systems["mindar-image-system"].start(); 
+        // 2. Safely trigger the scene engine loop sequential call
+        const sceneEl = document.getElementById('arScene');
+        
+        // Failsafe event wrapper ensuring framework assets compile perfectly
+        if (sceneEl.componentUsersLoading) {
+           sceneEl.addEventListener("loaded", () => {
+             sceneEl.systems["mindar-image-system"].start();
+           });
+        } else {
+           sceneEl.systems["mindar-image-system"].start();
+        }
       });
     </script>
   </body>
