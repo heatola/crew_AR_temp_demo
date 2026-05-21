@@ -2,25 +2,39 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- 1. Include the free A-Frame and Mind-AR libraries -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- 1. Highly stable A-Frame library -->
     <script src="https://aframe.io"></script>
+    
+    <!-- 2. Production version of Mind-AR -->
     <script src="https://jsdelivr.net"></script>
+    
+    <!-- 3. Crucial library to parse and play your Blender animation data -->
+    <script src="https://jsdelivr.net"></script>
+    
+    <style>
+      /* Ensure the UI loading screen fits correctly on mobile devices */
+      .mindar-ui-loading { display: flex; }
+      .mindar-ui-compatibility { display: none; }
+    </style>
   </head>
   
   <body style="margin: 0px; overflow: hidden;">
-    <!-- 2. Link your tracking targets file (.mind) here -->
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    
+    <!-- 4. Setup Mind-AR scene and link your direct target file path -->
+    <a-scene mindar-image="imageTargetSrc: targets.mind; uiLoading: yes; uiError: yes; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- 3. Pre-load your exported Blender 3D model (.glb) -->
-        <a-asset-item id="woodenModel" src="./wood_effect.glb"></a-asset-item>
+        <!-- 5. Link your direct 3D model file path -->
+        <a-asset-item id="woodenModel" src="wood_effect.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- 4. Tell the system to display the model when "Target 0" is scanned -->
+      <!-- 6. Target index 0 is your compiled 2D graphic card trigger -->
       
-        <!-- Adjust position, rotation, scale, and enable Blender animations -->
+        <!-- The 'animation-mixer' attribute auto-plays your default Blender animation timeline loop -->
         <a-gltf-model src="#woodenModel" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0" animation-mixer></a-gltf-model>
       
       
