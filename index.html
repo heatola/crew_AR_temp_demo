@@ -1,43 +1,73 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Wooden Figure AR</title>
     
-    <!-- 1. Highly stable A-Frame library -->
+    <!-- Stable WebAR Libraries -->
     <script src="https://aframe.io"></script>
-    
-    <!-- 2. Production version of Mind-AR -->
     <script src="https://jsdelivr.net"></script>
-    
-    <!-- 3. Crucial library to parse and play your Blender animation data -->
     <script src="https://jsdelivr.net"></script>
     
     <style>
-      /* Ensure the UI loading screen fits correctly on mobile devices */
-      .mindar-ui-loading { display: flex; }
-      .mindar-ui-compatibility { display: none; }
+      /* Absolute overlay UI for the Start Button */
+      #overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        font-family: sans-serif; color: white;
+      }
+      #startButton {
+        padding: 15px 35px; font-size: 18px; font-weight: bold;
+        background: #d4a373; color: white; border: none;
+        border-radius: 30px; cursor: pointer; transition: 0.2s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+      #startButton:active { transform: scale(0.95); }
+      #instruction { margin-top: 15px; font-size: 14px; opacity: 0.8; }
     </style>
   </head>
   
   <body style="margin: 0px; overflow: hidden;">
+
+    <!-- User Interaction Security Overlay -->
+    <div id="overlay">
+      <button id="startButton">OPEN AR CAMERA</button>
+      <div id="instruction">Tap to grant camera access</div>
+    </div>
     
-    <!-- 4. Setup Mind-AR scene and link your direct target file path -->
-    <a-scene mindar-image="imageTargetSrc: targets.mind; uiLoading: yes; uiError: yes; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <!-- AR Engine Scene Configuration -->
+    <a-scene id="arScene" mindar-image="imageTargetSrc: targets.mind; autoStart: false; uiLoading: yes; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- 5. Link your direct 3D model file path -->
         <a-asset-item id="woodenModel" src="wood_effect.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- 6. Target index 0 is your compiled 2D graphic card trigger -->
+      <!-- Matches Target index 0 from your tracking compiler -->
       
-        <!-- The 'animation-mixer' attribute auto-plays your default Blender animation timeline loop -->
-        <a-gltf-model src="#woodenModel" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0" animation-mixer></a-gltf-model>
+        <a-gltf-model src="#woodenModel" position="0 0 0" scale="1 1 1" rotation="0 0 0" animation-mixer></a-gltf-model>
       
       
     </a-scene>
+
+    <script>
+      // Script handling safe user activation sequence
+      const startButton = document.getElementById('startButton');
+      const overlay = document.getElementById('overlay');
+      const sceneEl = document.getElementById('arScene');
+
+      startButton.addEventListener('click', () => {
+        overlay.style.display = 'none'; // Clear the screen layer
+        
+        // Command Mind-AR system to explicitly start camera loop
+        sceneEl.systems["mindar-image-system"].start(); 
+      });
+    </script>
   </body>
 </html>
